@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "libgal.h"
 
 void newGal(void) {
+
+    matBuffer_t *starter = NULL;
 
     char selection;
 
@@ -14,7 +17,7 @@ void newGal(void) {
 
         case(GAL_MENU):
 
-            viewMenu();
+            viewMenu(starter);
             break;
 
         case(GAL_QUIT):

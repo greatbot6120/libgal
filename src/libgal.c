@@ -1,21 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "libgal.h"
 
-void viewMenu() {
+void viewMenu(matBuffer_t *headp) {
 
     int menuSel;
 
     printf("\t\tMENU:\n\n"
-           "1. Load Matrices\n"
-           "2. Save Matrices\n"
+           "1. Load Head Matrices\n"
+           "2. View buffer\n"
            "3. Sum Matrices\n"
            "4. Lambda-multiply Matrices\n"
            "5. Multiply Matrices\n"
            "6. Exit\n\n"
            "Enter a selection (1-6) >> ");
     scanf("%d", &menuSel);
-    fflush(stdin);
 
     /* check for right values */
     if( (menuSel < 1) || (menuSel > 6) ) {
@@ -30,7 +30,24 @@ void viewMenu() {
 
         case(1):
 
-            matLoad();
+            headp = matHeadLoad(headp);
+            viewMenu(headp);
+            break;
+
+        case(2):
+
+            if(headp != NULL) {
+
+                bufferView(headp);
+                viewMenu(headp);
+            
+            } else {
+
+                #if GAL_TRACE
+                    printf(">> ERROR, EMPTY LIST %s\n", GAL_ERROR);
+                    exit(EXIT_FAILURE);
+                #endif
+            }
             break;
 
         default:
@@ -44,29 +61,32 @@ void viewMenu() {
     }
 }
 
-void matLoad() {
+matBuffer_t* matHeadLoad(matBuffer_t *currentHead) {
      
-    long int rows, columns, i, j; 
+    matBuffer_t *newMatHead = malloc(sizeof(matBuffer_t));
+
+    long int i, j; 
     long double element;
-    int **loader;
 
     do {
 
         printf("Type the number of rows and columns respectively separated by a blank >> ");
     
-    } while(scanf("%li%li", &rows, &columns) != 2);
-    
-    loader = malloc(sizeof(int*) * rows);
+    } while(scanf("%d%d", &(newMatHead -> rows), &(newMatHead -> columns) ) != 2);
 
-    if(loader != NULL) {
+    printf("\n");
 
-        for(i = 0; i < rows; i++) {
+    newMatHead -> matAddress = malloc(sizeof(long double*) * newMatHead -> rows);
 
-            *(loader + i) = malloc(sizeof(int) * columns);
+    if(newMatHead -> matAddress != NULL) {
 
-            if(*(loader + i) != NULL) {
+        for(i = 0; i < newMatHead -> rows; i++) {
 
-                for(j = 0; j < columns; j++) {
+            *( (newMatHead -> matAddress) + i ) = malloc(sizeof(long double) * newMatHead -> columns);
+
+            if(*( (newMatHead -> matAddress) + i) != NULL ) {
+
+                for(j = 0; j < newMatHead -> columns; j++) {
             
                     do {
             
@@ -74,10 +94,54 @@ void matLoad() {
 
                     } while(scanf("%Lf", &element) != 1);
             
-                    *(*(loader + i) + j) = element;
+                    *(*( (newMatHead -> matAddress) + i ) + j) = element;
                 }
             }
         }
+
+        printf("\n");
     }
 
+    for(i = 0; i < newMatHead -> rows; i++) {
+
+        for(j= 0; j < newMatHead -> columns; j++) {
+
+            printf("(%.2Lf) ", *(*( (newMatHead -> matAddress) + i ) + j));
+        }
+
+        printf("\n\n");
+    }
+
+    newMatHead -> linkp = currentHead;
+    currentHead = newMatHead;
+
+    printf("\n");
+
+    #if GAL_TRACE
+        printf(">> MATRIX LOADED SUCCCESSFULLY %s\n", GAL_SUCCESS);
+    #endif
+
+    printf("\n");
+
+    return (currentHead);
+}
+
+void bufferView(matBuffer_t *currentView) {
+
+    long int i, j; 
+
+    if(currentView != NULL) {
+
+        for(i = 0; i < currentView -> rows; i++) {
+
+            for(j= 0; j < currentView -> columns; j++) {
+
+                printf("(%.2Lf) ", *(*( (currentView -> matAddress) + i ) + j));
+            }
+
+            printf("\n\n");
+        }
+    }
+
+    printf("\n");
 }
