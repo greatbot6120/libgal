@@ -15,6 +15,7 @@ void viewMenu() {
            "6. Exit\n\n"
            "Enter a selection (1-6) >> ");
     scanf("%d", &menuSel);
+    fflush(stdin);
 
     /* check for right values */
     if( (menuSel < 1) || (menuSel > 6) ) {
@@ -44,16 +45,17 @@ void viewMenu() {
 }
 
 void matLoad() {
-
-    int rows, columns, i, j, element;
+     
+    long int rows, columns, i, j; 
+    long double element;
     int **loader;
 
     do {
 
         printf("Type the number of rows and columns respectively separated by a blank >> ");
-   
-    } while(scanf("%d%d", &rows, &columns) != 2);
-
+    
+    } while(scanf("%li%li", &rows, &columns) != 2);
+    
     loader = malloc(sizeof(int*) * rows);
 
     if(loader != NULL) {
@@ -61,21 +63,21 @@ void matLoad() {
         for(i = 0; i < rows; i++) {
 
             *(loader + i) = malloc(sizeof(int) * columns);
-        }
-    }
 
-    if(*(loader + i) != NULL) {
+            if(*(loader + i) != NULL) {
 
-        for(i = 0; i < rows; i++) {
+                for(j = 0; j < columns; j++) {
+            
+                    do {
+            
+                        printf("Type in the [%li][%li] element >> ", i, j);
 
-            for(j = 0; j < columns; j++) {
-
-                do {
-
-                    printf("Type in the [%d][%d] element >> ", i, j);
-                
-                } while(scanf(" %d", &element) != 1);
+                    } while(scanf("%Lf", &element) != 1);
+            
+                    *(*(loader + i) + j) = element;
+                }
             }
         }
     }
+
 }
